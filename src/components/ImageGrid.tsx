@@ -1,55 +1,68 @@
 import React, { useState, useEffect } from 'react';
 import { fetchImages } from '../services/api';
-import Modal from './Modal';
+import ImageModal from './ImageModal';
 
 interface Image {
-  id: number;
+  _id: number;
   imgUrl: string;
   alt: string;
   description: string;
+  tags?: string[];
+  photographer?: string;
+  location?: string;
+  uploadDate?: string;
+  fileSize?: number;
 }
 
 const ImageGrid: React.FC = () => {
   const [images, setImages] = useState<Image[]>([]);
-  const [modalOpen, setModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<Image | null>(null);
-
+  console.log(selectedImage?._id)
   useEffect(() => {
     const loadImages = async () => {
       const data = await fetchImages();
-      
       setImages(data);
     };
     loadImages();
   }, []);
 
+  const playMeow = (image: Image) => {
+    const audio = new Audio(`sounds/${image?._id}.mp3`);
+    audio.play().catch(error => console.error('Erro ao tocar o áudio:', error));
+  };
+
   const handleImageClick = (image: Image) => {
     setSelectedImage(image);
-    setModalOpen(true);
+    if (image) {
+      console.log(image._id)
+      playMeow(image);
+    }
   };
 
   return (
-    <div>
-      <div className="image-grid" style={{ display: 'flex', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '16px' }}>
-        {images.map((image) => (
-          <article key={image.id} data-description={image.description}>
-            <figure>
-              <img
-                src={image.imgUrl}
-                alt={image.alt}
-                onClick={() => handleImageClick(image)}
-                style={{ width: '100%', height: 'auto', cursor: 'pointer' }}
-              />
-            </figure>
-          </article>
+    <div className="container mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {images.map(image => (
+          <div
+            key={image.id}
+            className="cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
+            onClick={() => handleImageClick(image)}
+          >
+            <img
+              src={image.imgUrl}
+              alt={image.alt}
+              className="w-full h-48 object-cover"
+            />
+          </div>
         ))}
       </div>
-      <Modal
-        isOpen={modalOpen}
-        onClose={() => setModalOpen(false)}
-        imgSrc={selectedImage?.imgUrl || ''}
-        caption={selectedImage?.description || selectedImage?.alt || ''}
-      />
+
+      {selectedImage && (
+        <ImageModal
+          image={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 };
