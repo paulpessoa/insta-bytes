@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface Image {
-    _id: number;
+    _id: string;
     imgUrl: string;
     alt: string;
     description: string;

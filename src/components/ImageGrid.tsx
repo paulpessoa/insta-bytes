@@ -3,7 +3,7 @@ import { fetchImages } from '../services/api';
 import ImageModal from './ImageModal';
 
 interface Image {
-  _id: number;
+  _id: string;
   imgUrl: string;
   alt: string;
   description: string;
@@ -44,7 +44,7 @@ const ImageGrid: React.FC = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
         {images.map(image => (
           <div
-            key={image.id}
+            key={image._id}
             className="cursor-pointer overflow-hidden rounded-lg shadow-md hover:shadow-xl transition-shadow duration-300 ease-in-out"
             onClick={() => handleImageClick(image)}
           >
